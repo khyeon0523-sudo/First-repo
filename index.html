@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>오늘의 식단 기록</title>
+<style>
+  :root {
+    --bg: #fbfbfa;
+    --card: #ffffff;
+    --border: #e9e9e7;
+    --text: #37352f;
+    --sub: #9b9a97;
+    --accent: #2383e2;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+  .date-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 4px;
+  }
+  .date-nav button {
+    border: none;
+    background: none;
+    font-size: 18px;
+    color: var(--sub);
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+  .date-nav button:hover { background: var(--border); }
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    margin: 0;
+  }
+  .today-btn {
+    display: block;
+    text-align: center;
+    font-size: 12px;
+    color: var(--accent);
+    cursor: pointer;
+    margin: 6px 0 36px;
+  }
+  .meal {
+    margin-bottom: 18px;
+  }
+  .meal-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--sub);
+    margin-bottom: 8px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 64px;
+    resize: vertical;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 15px;
+    line-height: 1.5;
+    font-family: inherit;
+    color: var(--text);
+    background: var(--card);
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  textarea:focus {
+    border-color: var(--accent);
+  }
+  textarea::placeholder {
+    color: var(--sub);
+  }
+  .save-status {
+    text-align: center;
+    font-size: 12px;
+    color: var(--sub);
+    height: 16px;
+    margin-top: 24px;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="date-nav">
+      <button id="prevBtn">‹</button>
+      <h1 id="dateTitle"></h1>
+      <button id="nextBtn">›</button>
+    </div>
+    <div class="today-btn" id="todayBtn">오늘로 이동</div>
+
+    <div class="meal">
+      <div class="meal-label">🌅 아침</div>
+      <textarea id="breakfast" placeholder="아침에 뭐 먹었어?"></textarea>
+    </div>
+    <div class="meal">
+      <div class="meal-label">🍚 점심</div>
+      <textarea id="lunch" placeholder="점심 메뉴 적어줘"></textarea>
+    </div>
+    <div class="meal">
+      <div class="meal-label">🍪 간식</div>
+      <textarea id="snack" placeholder="간식 먹은 거 있어?"></textarea>
+    </div>
+    <div class="meal">
+      <div class="meal-label">🌙 저녁</div>
+      <textarea id="dinner" placeholder="저녁 메뉴 적어줘"></textarea>
+    </div>
+
+    <div class="save-status" id="saveStatus"></div>
+  </div>
+
+<script>
+  const STORAGE_PREFIX = "dietlog_";
+  const meals = ["breakfast", "lunch", "snack", "dinner"];
+  let currentDate = new Date();
+
+  function formatKey(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+
+  function formatTitle(date) {
+    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+    const y = date.getFullYear();
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    const w = weekdays[date.getDay()];
+    return `${y}.${m}.${d} (${w})`;
+  }
+
+  function isSameDay(a, b) {
+    return formatKey(a) === formatKey(b);
+  }
+
+  function loadDate(date) {
+    const key = STORAGE_PREFIX + formatKey(date);
+    let data = {};
+    try {
+      data = JSON.parse(localStorage.getItem(key)) || {};
+    } catch (e) {
+      data = {};
+    }
+    meals.forEach((meal) => {
+      document.getElementById(meal).value = data[meal] || "";
+    });
+    document.getElementById("dateTitle").textContent = formatTitle(date);
+
+    const todayBtn = document.getElementById("todayBtn");
+    todayBtn.style.visibility = isSameDay(date, new Date()) ? "hidden" : "visible";
+  }
+
+  function saveCurrent() {
+    const key = STORAGE_PREFIX + formatKey(currentDate);
+    const data = {};
+    meals.forEach((meal) => {
+      data[meal] = document.getElementById(meal).value;
+    });
+    localStorage.setItem(key, JSON.stringify(data));
+
+    const status = document.getElementById("saveStatus");
+    status.textContent = "저장됨";
+    clearTimeout(saveCurrent._timer);
+    saveCurrent._timer = setTimeout(() => {
+      status.textContent = "";
+    }, 1200);
+  }
+
+  meals.forEach((meal) => {
+    document.getElementById(meal).addEventListener("input", saveCurrent);
+  });
+
+  document.getElementById("prevBtn").addEventListener("click", () => {
+    currentDate.setDate(currentDate.getDate() - 1);
+    loadDate(currentDate);
+  });
+
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    currentDate.setDate(currentDate.getDate() + 1);
+    loadDate(currentDate);
+  });
+
+  document.getElementById("todayBtn").addEventListener("click", () => {
+    currentDate = new Date();
+    loadDate(currentDate);
+  });
+
+  loadDate(currentDate);
+</script>
+</body>
+</html>
