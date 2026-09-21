@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>오늘의 식단 기록</title>
+<title>식단 기록</title>
 <style>
   :root {
     --bg: #fbfbfa;
@@ -12,6 +12,10 @@
     --text: #37352f;
     --sub: #9b9a97;
     --accent: #2383e2;
+    --pill-bg: #eaf2fd;
+    --pill-text: #1c6fd6;
+    --sun: #e0524a;
+    --sat: #2383e2;
   }
   * { box-sizing: border-box; }
   body {
@@ -21,18 +25,27 @@
     color: var(--text);
   }
   .wrap {
-    max-width: 640px;
+    max-width: 480px;
     margin: 0 auto;
-    padding: 48px 20px 80px;
+    padding: 28px 16px 100px;
   }
-  .date-nav {
+
+  /* ---- header / month nav ---- */
+  .app-title {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--sub);
+    margin: 0 0 18px;
+  }
+  .month-nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    margin-bottom: 4px;
+    gap: 14px;
+    margin-bottom: 14px;
   }
-  .date-nav button {
+  .month-nav button {
     border: none;
     background: none;
     font-size: 18px;
@@ -41,40 +54,180 @@
     padding: 4px 10px;
     border-radius: 6px;
   }
-  .date-nav button:hover { background: var(--border); }
-  h1 {
-    text-align: center;
-    font-size: 22px;
+  .month-nav button:hover { background: var(--border); }
+  .month-nav h1 {
+    font-size: 20px;
     margin: 0;
+    min-width: 130px;
+    text-align: center;
   }
-  .today-btn {
-    display: block;
+
+  /* ---- calendar grid ---- */
+  .weekday-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     text-align: center;
     font-size: 12px;
-    color: var(--accent);
-    cursor: pointer;
-    margin: 6px 0 36px;
+    color: var(--sub);
+    margin-bottom: 4px;
   }
+  .weekday-row span:first-child { color: var(--sun); }
+  .weekday-row span:last-child { color: var(--sat); }
+
+  .day-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
+  .day-cell {
+    min-height: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 6px;
+    cursor: pointer;
+    border-radius: 8px;
+  }
+  .day-cell.empty { cursor: default; }
+  .day-cell:not(.empty):hover { background: var(--border); }
+
+  .day-num {
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 14px;
+  }
+  .day-cell.sunday .day-num { color: var(--sun); }
+  .day-cell.saturday .day-num { color: var(--sat); }
+
+  .day-cell.today .day-num {
+    border: 1.5px solid var(--text);
+  }
+  .day-cell.selected .day-num {
+    background: var(--text);
+    color: #fff;
+    border: none;
+  }
+
+  .day-pill {
+    margin-top: 4px;
+    font-size: 10px;
+    color: var(--pill-text);
+    background: var(--pill-bg);
+    border-radius: 10px;
+    padding: 1px 6px;
+    line-height: 1.5;
+  }
+
+  .today-jump {
+    display: block;
+    width: fit-content;
+    margin: 22px auto 0;
+    font-size: 12px;
+    color: var(--accent);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+
+  /* ---- floating add button ---- */
+  .fab {
+    position: fixed;
+    right: 22px;
+    bottom: 28px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--text);
+    color: #fff;
+    border: none;
+    font-size: 28px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  }
+
+  /* ---- entry modal ---- */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 20;
+    display: none;
+    overflow-y: auto;
+  }
+  .modal.open { display: block; }
+  .modal-inner {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .modal-close {
+    border: none;
+    background: none;
+    font-size: 20px;
+    color: var(--sub);
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .modal-date-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .modal-date-nav button {
+    border: none;
+    background: none;
+    font-size: 18px;
+    color: var(--sub);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .modal-date-nav button:hover { background: var(--border); }
+  .modal-date-title {
+    font-size: 17px;
+    font-weight: 600;
+    min-width: 130px;
+    text-align: center;
+  }
+
   .meal {
-    margin-bottom: 18px;
+    margin-bottom: 14px;
+    margin-top: 22px;
   }
   .meal-label {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--sub);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
   textarea {
     width: 100%;
-    min-height: 64px;
-    resize: vertical;
+    min-height: 38px;
+    max-height: 160px;
+    resize: none;
+    overflow-y: auto;
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 15px;
+    padding: 9px 12px;
+    font-size: 14px;
     line-height: 1.5;
     font-family: inherit;
     color: var(--text);
@@ -93,43 +246,69 @@
     font-size: 12px;
     color: var(--sub);
     height: 16px;
-    margin-top: 24px;
+    margin-top: 18px;
   }
 </style>
 </head>
 <body>
   <div class="wrap">
-    <div class="date-nav">
-      <button id="prevBtn">‹</button>
-      <h1 id="dateTitle"></h1>
-      <button id="nextBtn">›</button>
-    </div>
-    <div class="today-btn" id="todayBtn">오늘로 이동</div>
+    <div class="app-title">🍽 식단 기록</div>
 
-    <div class="meal">
-      <div class="meal-label">🌅 아침</div>
-      <textarea id="breakfast" placeholder="아침에 뭐 먹었어?"></textarea>
-    </div>
-    <div class="meal">
-      <div class="meal-label">🍚 점심</div>
-      <textarea id="lunch" placeholder="점심 메뉴 적어줘"></textarea>
-    </div>
-    <div class="meal">
-      <div class="meal-label">🍪 간식</div>
-      <textarea id="snack" placeholder="간식 먹은 거 있어?"></textarea>
-    </div>
-    <div class="meal">
-      <div class="meal-label">🌙 저녁</div>
-      <textarea id="dinner" placeholder="저녁 메뉴 적어줘"></textarea>
+    <div class="month-nav">
+      <button id="prevMonthBtn">‹</button>
+      <h1 id="monthTitle"></h1>
+      <button id="nextMonthBtn">›</button>
     </div>
 
-    <div class="save-status" id="saveStatus"></div>
+    <div class="weekday-row">
+      <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+    </div>
+    <div class="day-grid" id="dayGrid"></div>
+
+    <div class="today-jump" id="todayJumpBtn">오늘로 이동</div>
+  </div>
+
+  <button class="fab" id="fabBtn">+</button>
+
+  <div class="modal" id="entryModal">
+    <div class="modal-inner">
+      <div class="modal-header">
+        <div class="modal-date-nav">
+          <button id="prevDayBtn">‹</button>
+          <div class="modal-date-title" id="modalDateTitle"></div>
+          <button id="nextDayBtn">›</button>
+        </div>
+        <button class="modal-close" id="modalCloseBtn">✕</button>
+      </div>
+
+      <div class="meal">
+        <div class="meal-label">🌅 아침</div>
+        <textarea id="breakfast" placeholder="아침에 뭐 먹었어?"></textarea>
+      </div>
+      <div class="meal">
+        <div class="meal-label">🍚 점심</div>
+        <textarea id="lunch" placeholder="점심 메뉴 적어줘"></textarea>
+      </div>
+      <div class="meal">
+        <div class="meal-label">🍪 간식</div>
+        <textarea id="snack" placeholder="간식 먹은 거 있어?"></textarea>
+      </div>
+      <div class="meal">
+        <div class="meal-label">🌙 저녁</div>
+        <textarea id="dinner" placeholder="저녁 메뉴 적어줘"></textarea>
+      </div>
+
+      <div class="save-status" id="saveStatus"></div>
+    </div>
   </div>
 
 <script>
   const STORAGE_PREFIX = "dietlog_";
   const meals = ["breakfast", "lunch", "snack", "dinner"];
-  let currentDate = new Date();
+  const weekdayNames = ["일", "월", "화", "수", "목", "금", "토"];
+
+  let viewYear, viewMonth; // calendar grid currently displayed
+  let selectedDate = new Date(); // highlighted day in calendar / active day in modal
 
   function formatKey(date) {
     const y = date.getFullYear();
@@ -138,38 +317,136 @@
     return `${y}-${m}-${d}`;
   }
 
-  function formatTitle(date) {
-    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-    const y = date.getFullYear();
-    const m = date.getMonth() + 1;
-    const d = date.getDate();
-    const w = weekdays[date.getDay()];
-    return `${y}.${m}.${d} (${w})`;
-  }
-
   function isSameDay(a, b) {
     return formatKey(a) === formatKey(b);
   }
 
-  function loadDate(date) {
-    const key = STORAGE_PREFIX + formatKey(date);
-    let data = {};
+  function getEntry(date) {
     try {
-      data = JSON.parse(localStorage.getItem(key)) || {};
+      return JSON.parse(localStorage.getItem(STORAGE_PREFIX + formatKey(date))) || {};
     } catch (e) {
-      data = {};
+      return {};
     }
-    meals.forEach((meal) => {
-      document.getElementById(meal).value = data[meal] || "";
-    });
-    document.getElementById("dateTitle").textContent = formatTitle(date);
+  }
 
-    const todayBtn = document.getElementById("todayBtn");
-    todayBtn.style.visibility = isSameDay(date, new Date()) ? "hidden" : "visible";
+  function filledCount(entry) {
+    return meals.filter((m) => (entry[m] || "").trim().length > 0).length;
+  }
+
+  // ---------- calendar ----------
+  function renderCalendar() {
+    document.getElementById("monthTitle").textContent = `${viewYear}년 ${viewMonth + 1}월`;
+
+    const grid = document.getElementById("dayGrid");
+    grid.innerHTML = "";
+
+    const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
+    const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    const today = new Date();
+
+    for (let i = 0; i < firstWeekday; i++) {
+      const empty = document.createElement("div");
+      empty.className = "day-cell empty";
+      grid.appendChild(empty);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cellDate = new Date(viewYear, viewMonth, d);
+      const weekday = cellDate.getDay();
+
+      const cell = document.createElement("div");
+      cell.className = "day-cell";
+      if (weekday === 0) cell.classList.add("sunday");
+      if (weekday === 6) cell.classList.add("saturday");
+      if (isSameDay(cellDate, today)) cell.classList.add("today");
+      if (isSameDay(cellDate, selectedDate)) cell.classList.add("selected");
+      cell.dataset.date = formatKey(cellDate);
+
+      const num = document.createElement("div");
+      num.className = "day-num";
+      num.textContent = d;
+      cell.appendChild(num);
+
+      const count = filledCount(getEntry(cellDate));
+      if (count > 0) {
+        const pill = document.createElement("div");
+        pill.className = "day-pill";
+        pill.textContent = `${count}/4`;
+        cell.appendChild(pill);
+      }
+
+      grid.appendChild(cell);
+    }
+  }
+
+  document.getElementById("dayGrid").addEventListener("click", (e) => {
+    const cell = e.target.closest(".day-cell");
+    if (!cell || cell.classList.contains("empty")) return;
+    const [y, m, d] = cell.dataset.date.split("-").map(Number);
+    selectedDate = new Date(y, m - 1, d);
+    renderCalendar();
+  });
+
+  document.getElementById("prevMonthBtn").addEventListener("click", () => {
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderCalendar();
+  });
+
+  document.getElementById("nextMonthBtn").addEventListener("click", () => {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderCalendar();
+  });
+
+  document.getElementById("todayJumpBtn").addEventListener("click", () => {
+    const today = new Date();
+    selectedDate = today;
+    viewYear = today.getFullYear();
+    viewMonth = today.getMonth();
+    renderCalendar();
+  });
+
+  // ---------- entry modal ----------
+  const modal = document.getElementById("entryModal");
+
+  function autosize(el) {
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  }
+
+  function formatModalTitle(date) {
+    const m = date.getMonth() + 1;
+    const d = date.getDate();
+    const w = weekdayNames[date.getDay()];
+    return `${m}월 ${d}일 (${w})`;
+  }
+
+  function loadModalDate(date) {
+    const data = getEntry(date);
+    meals.forEach((meal) => {
+      const el = document.getElementById(meal);
+      el.value = data[meal] || "";
+      autosize(el);
+    });
+    document.getElementById("modalDateTitle").textContent = formatModalTitle(date);
+  }
+
+  function openModal(date) {
+    selectedDate = date;
+    loadModalDate(selectedDate);
+    modal.classList.add("open");
+  }
+
+  function closeModal() {
+    modal.classList.remove("open");
+    viewYear = selectedDate.getFullYear();
+    viewMonth = selectedDate.getMonth();
+    renderCalendar();
   }
 
   function saveCurrent() {
-    const key = STORAGE_PREFIX + formatKey(currentDate);
+    const key = STORAGE_PREFIX + formatKey(selectedDate);
     const data = {};
     meals.forEach((meal) => {
       data[meal] = document.getElementById(meal).value;
@@ -185,25 +462,37 @@
   }
 
   meals.forEach((meal) => {
-    document.getElementById(meal).addEventListener("input", saveCurrent);
+    const el = document.getElementById(meal);
+    el.addEventListener("input", () => {
+      autosize(el);
+      saveCurrent();
+    });
   });
 
-  document.getElementById("prevBtn").addEventListener("click", () => {
-    currentDate.setDate(currentDate.getDate() - 1);
-    loadDate(currentDate);
+  document.getElementById("fabBtn").addEventListener("click", () => {
+    openModal(selectedDate);
   });
 
-  document.getElementById("nextBtn").addEventListener("click", () => {
-    currentDate.setDate(currentDate.getDate() + 1);
-    loadDate(currentDate);
+  document.getElementById("modalCloseBtn").addEventListener("click", closeModal);
+
+  document.getElementById("prevDayBtn").addEventListener("click", () => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() - 1);
+    selectedDate = d;
+    loadModalDate(selectedDate);
   });
 
-  document.getElementById("todayBtn").addEventListener("click", () => {
-    currentDate = new Date();
-    loadDate(currentDate);
+  document.getElementById("nextDayBtn").addEventListener("click", () => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + 1);
+    selectedDate = d;
+    loadModalDate(selectedDate);
   });
 
-  loadDate(currentDate);
+  // ---------- init ----------
+  viewYear = selectedDate.getFullYear();
+  viewMonth = selectedDate.getMonth();
+  renderCalendar();
 </script>
 </body>
 </html>
