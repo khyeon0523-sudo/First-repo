@@ -78,10 +78,10 @@ td.memo{white-space:normal;max-width:180px;color:var(--muted);font-size:13px}
 .rate{font-weight:700;color:var(--accent-text)}
 .chk th,.chk td{text-align:center;padding:8px 4px}
 .chk td:first-child,.chk th:first-child{text-align:left;white-space:normal;min-width:150px}
-.cell{width:34px;height:34px;border-radius:50%;border:0;background:var(--fill);cursor:pointer;font-weight:700;color:var(--ink)}
+.cell{width:30px;height:26px;border-radius:8px;border:1px solid #e6e0f5;background:#ffffff;cursor:pointer;font-weight:800;font-size:13px;line-height:1;color:#bbbbbb;padding:0}
 .cell:hover{filter:brightness(.94)}
-.cell.O{background:var(--good);color:#fff}
-.cell.X{background:var(--bad);color:#fff}
+.cell.O{background:#e3f1e4;color:#2f8f4e;border-color:#bfe0c2}
+.cell.X{background:#f7e4e1;color:#c9302c;border-color:#e8c4bd}
 .today{background:color-mix(in srgb,var(--accent) 8%,transparent)}
 .msg{font-size:13px;color:var(--muted);min-height:18px;text-align:center}
 dialog{border:0;border-radius:20px;background:var(--surface);color:var(--ink);max-width:440px;width:calc(100% - 32px);padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -107,6 +107,7 @@ section,.tile{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-
 th{background:#ddd6fc;color:#3b2f9a;font-weight:700;font-size:13px;text-align:center;border:1px solid #ffffff;border-bottom:1px solid #ffffff}
 th.num{text-align:center}
 .chk th:first-child{text-align:center}
+.chk td{font-size:13px}
 tbody tr:nth-child(even){background:#f7f5ff}
 td input.paid-in{min-height:34px;padding:4px 6px;width:128px;font-size:13px;background:#ffffff;border:1px solid #ddd6fc}
 #rows td,#rows td.memo,#rows .pill,#rows .btn,#rows input{font-size:13px}
@@ -374,7 +375,7 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
       var name=hb.name,hi=hb.id;
       h+='<tr><td>'+esc(name)+'</td>'+days.map(function(d){
         var k=ymd(d),v=(checks[k]&&checks[k][hi])||'';
-        return '<td class="'+(k===today?'today':'')+'"><button type="button" class="cell '+v+'" data-d="'+k+'" data-h="'+hi+'" aria-label="'+esc(name)+' '+k+' '+(v||'비움')+'">'+v+'</button></td>';
+        return '<td class="'+(k===today?'today':'')+'"><button type="button" class="cell '+v+'" data-d="'+k+'" data-h="'+hi+'" aria-label="'+esc(name)+' '+k+' '+(v||'비움')+'">'+(v||'·')+'</button></td>';
       }).join('')+'</tr>';
     });
     var foot='<tfoot><tr><td>일별 실천율</td>'+days.map(function(d){
