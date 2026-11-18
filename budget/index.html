@@ -129,14 +129,15 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   <section>
     <h2 id="formTitle">부수입 추가</h2>
     <form id="f">
+      <label>기록일<input id="fRec" type="date"></label>
       <label>항목<select id="fCat"></select></label>
-      <label class="span2">상세내용<input id="fDetail" required placeholder="예: 신규 발급 캐시백"></label>
       <label>플랫폼 / 앱<input id="fPlat" placeholder="예: 토스, 신한카드"></label>
+      <label class="span3">상세내용<input id="fDetail" required placeholder="예: 신규 발급 캐시백"></label>
       <label>신청일<input id="fApply" type="date"></label>
       <label>입금예정일<input id="fDue" type="date"></label>
-      <label>금액(원)<input id="fAmt" type="number" min="0" step="1" required inputmode="numeric"></label>
       <label>실입금일<input id="fPaid" type="date"></label>
-      <label>메모<input id="fMemo"></label>
+      <label>금액(원)<input id="fAmt" type="number" min="0" step="1" required inputmode="numeric" placeholder="예: 15000"></label>
+      <label class="span2">메모<input id="fMemo" placeholder="선택 입력"></label>
       <div class="span3 row">
         <button class="btn primary" id="fSave" type="submit">추가하기</button>
         <button class="btn" id="fCancel" type="button" hidden>수정 취소</button>
@@ -147,7 +148,7 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   <section>
     <div class="listhead"><h2>기록 목록</h2><button class="btn" id="btnExport" type="button">CSV 내보내기</button></div>
     <div class="scroll"><table>
-      <thead><tr><th>상태</th><th>항목</th><th>상세</th><th>플랫폼</th><th>신청일</th><th>예정일</th><th>실입금일</th><th class="num">금액</th><th>메모</th><th></th></tr></thead>
+      <thead><tr><th>기록일</th><th>항목</th><th>상세내용</th><th>플랫폼</th><th>신청일</th><th>입금예정</th><th>실입금</th><th class="num">금액</th><th>상태</th><th>메모</th><th></th></tr></thead>
       <tbody id="rows"></tbody>
     </table></div>
   </section>
@@ -236,27 +237,27 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 
   $('fCat').innerHTML=CATS.map(function(c){return '<option>'+c+'</option>'}).join('');
-  $('fApply').value=ymd(new Date());
+  $('fRec').value=ymd(new Date());
 
   /* ---------- 기록 ---------- */
   $('f').addEventListener('submit',function(e){
     e.preventDefault();
     var r={id:editId||uid(),cat:$('fCat').value,detail:$('fDetail').value.trim(),plat:$('fPlat').value.trim(),
-      apply:$('fApply').value,due:$('fDue').value,paid:$('fPaid').value,amt:Math.max(0,Number($('fAmt').value)||0),memo:$('fMemo').value.trim(),u:Date.now()};
+      rec:$('fRec').value,apply:$('fApply').value,due:$('fDue').value,paid:$('fPaid').value,amt:Math.max(0,Number($('fAmt').value)||0),memo:$('fMemo').value.trim(),u:Date.now()};
     if(!r.detail){return}
     if(editId){recs=recs.map(function(x){return x.id===editId?r:x});say('수정했어요.')}
     else{recs.unshift(r);say('추가했어요.')}
     save(K_REC,recs);resetForm();render();
   });
   function resetForm(){
-    editId=null;$('f').reset();$('fApply').value=ymd(new Date());
+    editId=null;$('f').reset();$('fRec').value=ymd(new Date());
     $('formTitle').textContent='부수입 추가';$('fSave').textContent='추가하기';$('fCancel').hidden=true;
   }
   $('fCancel').onclick=resetForm;
   function startEdit(id){
     var r=recs.filter(function(x){return x.id===id})[0];if(!r)return;
     editId=id;
-    $('fCat').value=r.cat;$('fDetail').value=r.detail;$('fPlat').value=r.plat;$('fApply').value=r.apply;
+    $('fCat').value=r.cat;$('fDetail').value=r.detail;$('fPlat').value=r.plat;$('fRec').value=r.rec||'';$('fApply').value=r.apply;
     $('fDue').value=r.due;$('fPaid').value=r.paid;$('fAmt').value=r.amt;$('fMemo').value=r.memo;
     $('formTitle').textContent='기록 수정';$('fSave').textContent='수정 저장';$('fCancel').hidden=false;
     $('f').scrollIntoView({behavior:'smooth',block:'center'});$('fDetail').focus();
@@ -290,13 +291,13 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
       '<div class="tile wait"><div class="l">입금 대기</div><div class="v">'+won(wait)+'</div></div>'+
       '<div class="tile n"><div class="l">총 건수</div><div class="v">'+recs.length+'건</div></div>';
 
-    var sorted=recs.slice().sort(function(a,b){return (b.apply||'').localeCompare(a.apply||'')});
+    var sorted=recs.slice().sort(function(a,b){return (b.rec||b.apply||'').localeCompare(a.rec||a.apply||'')});
     $('rows').innerHTML=sorted.length?sorted.map(function(r){
-      return '<tr><td><span class="pill '+(r.paid?'done':'pend')+'">'+(r.paid?'완료':'대기')+'</span></td>'+
+      return '<tr><td>'+esc(r.rec)+'</td>'+
         '<td>'+esc(r.cat)+'</td><td>'+esc(r.detail)+'</td><td>'+esc(r.plat)+'</td><td>'+esc(r.apply)+'</td><td>'+esc(r.due)+'</td><td>'+esc(r.paid)+'</td>'+
-        '<td class="num">'+won(r.amt)+'</td><td class="memo">'+esc(r.memo)+'</td>'+
+        '<td class="num">'+won(r.amt)+'</td><td><span class="pill '+(r.paid?'done':'pend')+'">'+(r.paid?'완료':'대기')+'</span></td><td class="memo">'+esc(r.memo)+'</td>'+
         '<td><button class="btn" data-a="edit" data-id="'+r.id+'" aria-label="수정">수정</button> <button class="btn danger" data-a="del" data-id="'+r.id+'" aria-label="삭제">삭제</button></td></tr>';
-    }).join(''):'<tr><td colspan="10" class="empty">아직 기록이 없어요. 위에서 첫 부수입을 추가해 보세요.</td></tr>';
+    }).join(''):'<tr><td colspan="11" class="empty">아직 기록이 없어요. 위에서 첫 부수입을 추가해 보세요.</td></tr>';
 
     var cat={};CATS.forEach(function(c){cat[c]={s:0,n:0}});
     recs.forEach(function(r){var c=cat[r.cat]||(cat[r.cat]={s:0,n:0});c.s+=r.amt;c.n++});
@@ -304,7 +305,7 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
     $('byCat').innerHTML=Object.keys(cat).map(function(k){return barRow(k,cat[k].s,cat[k].n,cmax)}).join('');
 
     var mon={};
-    recs.forEach(function(r){var m=(r.apply||r.due||r.paid||'').slice(0,7)||'날짜 없음';var o=mon[m]||(mon[m]={s:0,n:0});o.s+=r.amt;o.n++});
+    recs.forEach(function(r){var m=(r.rec||r.apply||r.due||r.paid||'').slice(0,7)||'날짜 없음';var o=mon[m]||(mon[m]={s:0,n:0});o.s+=r.amt;o.n++});
     var mk=Object.keys(mon).sort().reverse();
     var mmax=Math.max.apply(null,mk.map(function(k){return mon[k].s}).concat([1]));
     $('byMonth').innerHTML=mk.length?mk.map(function(k){return barRow(k,mon[k].s,mon[k].n,mmax)}).join(''):'<div class="empty">기록이 쌓이면 월별로 보여드려요.</div>';
@@ -363,11 +364,11 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   $('wThis').onclick=function(){weekOffset=0;renderWeek()};
 
   /* ---------- CSV ---------- */
-  var HEAD=['항목','상세내용','플랫폼','신청일','입금예정일','실입금일','금액','메모'];
+  var HEAD=['기록일','항목','상세내용','플랫폼','신청일','입금예정일','실입금일','금액','메모'];
   function q(v){v=String(v==null?'':v);return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
   function toCSV(){
     var lines=[HEAD.join(',')];
-    recs.slice().reverse().forEach(function(r){lines.push([r.cat,r.detail,r.plat,r.apply,r.due,r.paid,r.amt,r.memo].map(q).join(','))});
+    recs.slice().reverse().forEach(function(r){lines.push([r.rec,r.cat,r.detail,r.plat,r.apply,r.due,r.paid,r.amt,r.memo].map(q).join(','))});
     return '﻿'+lines.join('\r\n');
   }
   function parseCSV(t){
@@ -406,11 +407,12 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
     var rd=new FileReader();
     rd.onload=function(){
       var rows=parseCSV(String(rd.result));
-      if(rows.length<2||rows[0][0].replace(/\s/g,'')!=='항목'){say('이 앱에서 내보낸 CSV가 아니에요. 첫 줄이 "항목"으로 시작해야 해요.');input.value='';return}
+      var h0=rows.length?rows[0][0].replace(/\s/g,''):'',o=h0==='기록일'?1:0;
+      if(rows.length<2||(h0!=='기록일'&&h0!=='항목')){say('이 앱에서 내보낸 CSV가 아니에요. 첫 줄이 "기록일" 또는 "항목"으로 시작해야 해요.');input.value='';return}
       var add=[];
       rows.slice(1).forEach(function(c){
-        if(c.length<7||!c[1])return;
-        add.push({id:uid(),cat:c[0]||'기타',detail:c[1],plat:c[2]||'',apply:c[3]||'',due:c[4]||'',paid:c[5]||'',amt:Math.max(0,Number(c[6])||0),memo:c[7]||'',u:Date.now()});
+        if(c.length<7+o||!c[1+o])return;
+        add.push({id:uid(),rec:o?(c[0]||''):'',cat:c[0+o]||'기타',detail:c[1+o],plat:c[2+o]||'',apply:c[3+o]||'',due:c[4+o]||'',paid:c[5+o]||'',amt:Math.max(0,Number(c[6+o])||0),memo:c[7+o]||'',u:Date.now()});
       });
       var seen={};function rk(r){return JSON.stringify([r.cat,r.detail,r.plat,r.apply,r.due,r.paid,r.amt,r.memo])}
       recs.forEach(function(r){seen[rk(r)]=1});
@@ -433,7 +435,7 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   function b64e(t){return btoa(unescape(encodeURIComponent(t)))}
   function b64d(t){return decodeURIComponent(escape(atob(t)))}
   function makeCode(){return 'BUDGET1.'+b64e(JSON.stringify({v:1,records:recs,checks:checks,retros:retros,dels:dels,ts:ts}))}
-  function cleanRec(r){return {id:String(r.id),cat:String(r.cat||'기타'),detail:String(r.detail||''),plat:String(r.plat||''),apply:String(r.apply||''),due:String(r.due||''),paid:String(r.paid||''),amt:Math.max(0,Number(r.amt)||0),memo:String(r.memo||''),u:Number(r.u)||0}}
+  function cleanRec(r){return {id:String(r.id),rec:String(r.rec||''),cat:String(r.cat||'기타'),detail:String(r.detail||''),plat:String(r.plat||''),apply:String(r.apply||''),due:String(r.due||''),paid:String(r.paid||''),amt:Math.max(0,Number(r.amt)||0),memo:String(r.memo||''),u:Number(r.u)||0}}
   function cleanDay(o){var out={};if(o&&typeof o==='object')Object.keys(o).forEach(function(h){if(o[h]==='O'||o[h]==='X')out[h]=o[h]});return out}
   function uniq(a){var seen={};return a.filter(function(k){if(seen[k])return false;seen[k]=1;return true})}
   function copyObj(o){return JSON.parse(JSON.stringify(o))}
