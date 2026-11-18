@@ -127,10 +127,10 @@ section.white{background:#ffffff}
 .vbar{width:60%;max-width:34px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#8f7bff,#6b5bd6)}
 .vlab{font-size:12px;color:var(--muted);border-top:1px solid #ddd6fc;padding-top:4px;width:100%;text-align:center}
 .week{justify-content:flex-end}
-.weeknav{display:flex;align-items:center;gap:10px}
+.weeknav{display:flex;align-items:center;gap:6px}
 #wLabel{font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
-.navbtn{width:30px;height:30px;border-radius:50%;border:1px solid #ddd6fc;background:#ffffff;color:#5646c2;font-weight:700;font-size:14px;line-height:1;cursor:pointer;padding:0}
-.navbtn:hover{background:#f3f0ff}
+.navbtn{width:28px;height:28px;border:0;background:transparent;color:#6b5bd6;font-size:15px;line-height:1;cursor:pointer;padding:0;border-radius:6px}
+.navbtn:hover{background:#f3f0ff;color:#5646c2}
 .navbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 @media (max-width:720px){
@@ -215,15 +215,14 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 
   <div class="view" id="view-check" hidden>
   <section>
-    <h2>데일리 지출 점검표</h2>
-    <div class="week">
+    <div class="listhead">
+      <h2>데일리 지출 점검표</h2>
       <div class="weeknav">
-        <button class="navbtn" id="wPrev" type="button" aria-label="이전 주">&lt;</button>
+        <button class="navbtn" id="wPrev" type="button" aria-label="이전 주">&#9664;&#xFE0E;</button>
         <span id="wLabel"></span>
-        <button class="navbtn" id="wNext" type="button" aria-label="다음 주">&gt;</button>
+        <button class="navbtn" id="wNext" type="button" aria-label="다음 주">&#9654;&#xFE0E;</button>
       </div>
     </div>
-    <p class="sub" style="margin-bottom:8px">칸을 누르면 O, X, 비움 순서로 바뀝니다.</p>
     <div class="scroll"><table class="chk" id="chk" style="min-width:520px"></table></div>
     <label style="margin-top:12px">이번 주 한 줄 회고<input id="retro" maxlength="120" placeholder="이번 주 소비를 한 줄로 돌아보기"></label>
   </section>
