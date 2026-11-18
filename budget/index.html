@@ -25,7 +25,7 @@ body{background:
     var(--bg);
   background-attachment:fixed;min-height:100%;color:var(--ink);font-family:var(--body);line-height:1.5;font-size:15px;-webkit-font-smoothing:antialiased}
 .nav{position:sticky;top:0;z-index:10;background:var(--nav);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
-.nav-in{max-width:980px;margin:0 auto;padding:12px 16px;display:flex;flex-direction:column;align-items:stretch;gap:10px}
+.nav-in{max-width:980px;margin:0 auto;padding:14px 16px;display:flex;flex-direction:column;align-items:stretch;gap:20px}
 .brand{font-weight:800;font-size:clamp(24px,5.5vw,30px);line-height:1.2;letter-spacing:-.02em;display:inline-flex;align-items:center;gap:8px}
 .brand::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent)}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:24px 16px 80px;display:flex;flex-direction:column;gap:24px}
@@ -50,7 +50,8 @@ section{background:var(--surface);border-radius:24px;padding:28px}
 .tile:first-child{background:linear-gradient(145deg,#7d6df0,#4a8be8)}
 .tile:first-child .l{color:var(--accent-ink);opacity:.82}
 .tile:first-child .v{color:var(--accent-ink)}
-form{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+form{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.c3{grid-column:span 3}.c6{grid-column:span 6}
 label{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);font-weight:500}
 input,select,textarea{background:var(--fill);border:1px solid transparent;border-radius:12px;padding:10px 12px;min-height:44px;width:100%;color:var(--ink)}
 input::placeholder{color:var(--muted);opacity:.7}
@@ -107,13 +108,18 @@ th{background:#ddd6fc;color:#3b2f9a;font-weight:700;font-size:13px;text-align:ce
 th.num{text-align:center}
 .chk th:first-child{text-align:center}
 tbody tr:nth-child(even){background:#f7f5ff}
-td input.paid-in{min-height:34px;padding:4px 8px;width:140px;font-size:13px}
+td input.paid-in{min-height:34px;padding:4px 6px;width:128px;font-size:13px}
 #rows td,#rows td.memo,#rows .pill,#rows .btn,#rows input{font-size:13px}
+section.white{background:#ffffff}
+.tight{width:auto;min-width:0;margin:0 auto}
+.tight th,.tight td{padding:8px 6px}
+#rows .btn{padding:4px 10px;min-height:30px}
 textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 @media (max-width:720px){
   section{padding:20px;border-radius:20px}
   .tiles{grid-template-columns:repeat(2,1fr)}
-  form{grid-template-columns:1fr 1fr}
+  form{grid-template-columns:repeat(2,1fr)}
+  .c3{grid-column:auto}.c6{grid-column:1/-1}
   .span2,.span3{grid-column:1/-1}
   .two{grid-template-columns:1fr}
 }
@@ -132,16 +138,16 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   <div class="msg" id="msg" role="status"></div>
 
   <div class="view" id="view-log">
-  <section>
+  <section class="white">
     <h2 id="formTitle">부수입 추가</h2>
     <form id="f">
-      <label>기록일<input id="fRec" type="date"></label>
-      <label>항목<select id="fCat"></select></label>
-      <label>플랫폼 / 앱<input id="fPlat" placeholder="예: 토스, 신한카드"></label>
-      <label class="span3">상세내용<input id="fDetail" required placeholder="예: 신규 발급 캐시백"></label>
-      <label>신청일<input id="fApply" type="date"></label>
-      <label>입금예정일<input id="fDue" type="date"></label>
-      <label>금액(원)<input id="fAmt" type="number" min="0" step="1" required inputmode="numeric" placeholder="예: 15000"></label>
+      <label class="c3">기록일<input id="fRec" type="date"></label>
+      <label class="c3">항목<select id="fCat"></select></label>
+      <label class="c6">상세내용<input id="fDetail" required placeholder="예: 신규 발급 캐시백"></label>
+      <label class="c3">플랫폼 / 앱<input id="fPlat" placeholder="예: 토스, 신한카드"></label>
+      <label class="c3">신청일<input id="fApply" type="date"></label>
+      <label class="c3">입금예정일<input id="fDue" type="date"></label>
+      <label class="c3">금액(원)<input id="fAmt" type="number" min="0" step="1" required inputmode="numeric" placeholder="예: 15000"></label>
       <label class="span3">메모<input id="fMemo" placeholder="선택 입력"></label>
       <div class="span3 row">
         <button class="btn primary" id="fSave" type="submit">추가하기</button>
@@ -150,9 +156,9 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
     </form>
   </section>
 
-  <section>
+  <section class="white">
     <div class="listhead"><h2>기록 목록</h2><button class="btn" id="btnExport" type="button">CSV 내보내기</button></div>
-    <div class="scroll"><table>
+    <div class="scroll"><table class="tight">
       <thead><tr><th>기록일</th><th>항목</th><th>상세내용</th><th>플랫폼</th><th>신청일</th><th>입금예정</th><th>실입금</th><th class="num">금액</th><th>상태</th><th>메모</th><th></th></tr></thead>
       <tbody id="rows"></tbody>
     </table></div>
