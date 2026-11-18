@@ -121,6 +121,11 @@ section.white{background:#ffffff}
 #rows td.act{white-space:nowrap;text-align:center}
 .msg:empty{display:none}
 #fSave{padding:7px 18px;min-height:36px;font-size:14px}
+.vchart{display:flex;gap:8px;align-items:flex-end;overflow-x:auto;padding:4px 2px 2px}
+.vcol{flex:1;min-width:62px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px}
+.vamt{font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
+.vbar{width:60%;max-width:34px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#8f7bff,#6b5bd6)}
+.vlab{font-size:12px;color:var(--muted);border-top:1px solid #ddd6fc;padding-top:4px;width:100%;text-align:center}
 textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 @media (max-width:720px){
   section{padding:20px;border-radius:20px}
@@ -330,10 +335,19 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 
     var mon={};
     recs.forEach(function(r){var m=(r.rec||r.apply||r.due||r.paid||'').slice(0,7)||'날짜 없음';var o=mon[m]||(mon[m]={s:0,n:0});o.s+=r.amt;o.n++});
-    var mk=Object.keys(mon).sort().reverse();
-    var mmax=Math.max.apply(null,mk.map(function(k){return mon[k].s}).concat([1]));
-    $('byMonth').innerHTML=mk.length?mk.map(function(k){return barRow(k,mon[k].s,mon[k].n,mmax)}).join(''):'<div class="empty">기록이 쌓이면 월별로 보여드려요.</div>';
+    var mk=Object.keys(mon).sort();
+    $('byMonth').innerHTML=monthChart(mk,mon);
     renderWeek();
+  }
+  /* 월별 누적: 세로 막대, 왼쪽에서 오른쪽으로 시간 순서, 금액은 막대 위 */
+  function monthChart(keys,mon){
+    if(!keys.length)return '<div class="empty">기록이 쌓이면 월별로 보여드려요.</div>';
+    var max=Math.max.apply(null,keys.map(function(k){return mon[k].s}).concat([1]));
+    return '<div class="vchart">'+keys.map(function(k){
+      var h=mon[k].s>0?Math.max(4,Math.round(mon[k].s/max*140)):3;
+      var lab=/^\d{4}-\d{2}$/.test(k)?k.slice(2).replace('-','.'):k;
+      return '<div class="vcol"><span class="vamt">'+won(mon[k].s)+'</span><div class="vbar" style="height:'+h+'px"></div><span class="vlab">'+esc(lab)+'</span></div>';
+    }).join('')+'</div>';
   }
   function barRow(label,sum,n,max){
     return '<div class="bar"><span>'+esc(label)+'</span><div class="track"><div class="fill" style="width:'+(sum/max*100)+'%"></div></div><span class="amt">'+won(sum)+' <small>'+n+'건</small></span></div>';
