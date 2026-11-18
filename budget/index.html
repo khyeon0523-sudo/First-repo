@@ -112,8 +112,12 @@ td input.paid-in{min-height:34px;padding:4px 6px;width:128px;font-size:13px}
 #rows td,#rows td.memo,#rows .pill,#rows .btn,#rows input{font-size:13px}
 section.white{background:#ffffff}
 .tight{width:auto;min-width:0;margin:0 auto}
-.tight th,.tight td{padding:8px 6px}
-#rows .btn{padding:4px 10px;min-height:30px}
+.tight th,.tight td{padding:8px 6px;background:#ffffff;border:1px solid #ddd6fc}
+.tight tbody tr:nth-child(even){background:#ffffff}
+#rows .icon-btn{background:transparent;border:0;cursor:pointer;padding:4px 5px;font-size:15px;line-height:1;border-radius:6px}
+#rows .icon-btn:hover{background:#f3f0ff}
+#rows .icon-btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+#rows td.act{white-space:nowrap;text-align:center}
 textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 @media (max-width:720px){
   section{padding:20px;border-radius:20px}
@@ -313,7 +317,7 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
       return '<tr><td>'+esc(r.rec)+'</td>'+
         '<td>'+esc(r.cat)+'</td><td>'+esc(r.detail)+'</td><td>'+esc(r.plat)+'</td><td>'+esc(r.apply)+'</td><td>'+esc(r.due)+'</td><td><input type="date" class="paid-in" data-id="'+r.id+'" value="'+esc(r.paid)+'" aria-label="실입금일"></td>'+
         '<td class="num">'+won(r.amt)+'</td><td><span class="pill '+(r.paid?'done':'pend')+'">'+(r.paid?'완료':'대기')+'</span></td><td class="memo">'+esc(r.memo)+'</td>'+
-        '<td><button class="btn" data-a="edit" data-id="'+r.id+'" aria-label="수정">수정</button> <button class="btn danger" data-a="del" data-id="'+r.id+'" aria-label="삭제">삭제</button></td></tr>';
+        '<td class="act"><button class="icon-btn" data-a="edit" data-id="'+r.id+'" aria-label="수정" title="수정">✏️</button><button class="icon-btn" data-a="del" data-id="'+r.id+'" aria-label="삭제" title="삭제">❌</button></td></tr>';
     }).join(''):'<tr><td colspan="11" class="empty">아직 기록이 없어요. 위에서 첫 부수입을 추가해 보세요.</td></tr>';
 
     var cat={};CATS.forEach(function(c){cat[c]={s:0,n:0}});
