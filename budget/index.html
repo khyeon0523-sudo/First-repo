@@ -132,6 +132,7 @@ section.white{background:#ffffff}
 .navbtn{width:28px;height:28px;border:0;background:transparent;color:#6b5bd6;font-size:15px;line-height:1;cursor:pointer;padding:0;border-radius:6px}
 .navbtn:hover{background:#f3f0ff;color:#5646c2}
 .navbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chk tfoot td{font-weight:700;color:#4b3fb0;border-top:2px solid #ddd6fc;font-variant-numeric:tabular-nums}
 textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 @media (max-width:720px){
   section{padding:20px;border-radius:20px}
@@ -376,7 +377,13 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
         return '<td class="'+(k===today?'today':'')+'"><button type="button" class="cell '+v+'" data-d="'+k+'" data-h="'+hi+'" aria-label="'+esc(name)+' '+k+' '+(v||'비움')+'">'+v+'</button></td>';
       }).join('')+'</tr>';
     });
-    $('chk').innerHTML=h+'</tbody>';
+    var foot='<tfoot><tr><td>일별 실천율</td>'+days.map(function(d){
+      var k=ymd(d),c=checks[k]||{},o=0;
+      HABITS.forEach(function(hb){if(c[hb.id]==='O')o++});
+      var txt=k<=today?Math.round(o/HABITS.length*100)+'%':'-';
+      return '<td class="'+(k===today?'today':'')+'">'+txt+'</td>';
+    }).join('')+'</tr></tfoot>';
+    $('chk').innerHTML=h+'</tbody>'+foot;
     var e=days[6];
     $('wLabel').textContent=days[0].getFullYear()+'.'+pad(days[0].getMonth()+1)+'.'+pad(days[0].getDate())+' ~ '+pad(e.getMonth()+1)+'.'+pad(e.getDate());
     $('retro').value=retros[ymd(s)]||'';
