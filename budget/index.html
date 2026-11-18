@@ -93,6 +93,16 @@ dialog::backdrop{background:rgba(0,0,0,.4);-webkit-backdrop-filter:blur(6px);bac
 .nav .btn:hover{background:rgba(255,255,255,.24);filter:none}
 .msg{color:rgba(255,255,255,.78)}
 section,.tile{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(4,5,25,.35)}
+.tabs{display:flex;gap:4px;background:rgba(255,255,255,.12);padding:4px;border-radius:980px}
+.tab{border:0;background:transparent;color:#fff;border-radius:980px;padding:8px 18px;cursor:pointer;font-weight:500;min-height:36px;font-size:14px;white-space:nowrap}
+.tab:hover{background:rgba(255,255,255,.14)}
+.tab.active{background:#fff;color:var(--accent-text);font-weight:700}
+.tab:focus-visible{outline:3px solid rgba(255,255,255,.7);outline-offset:2px}
+.view{display:flex;flex-direction:column;gap:24px}
+.view[hidden]{display:none}
+.listhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:16px}
+.listhead h2{margin:0}
+@media (max-width:720px){.tabs{width:100%}.tab{flex:1;padding:8px 6px}}
 textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 @media (max-width:720px){
   section{padding:20px;border-radius:20px}
@@ -106,17 +116,16 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 </head>
 <body>
 <canvas id="stars" aria-hidden="true"></canvas>
-<nav class="nav"><div class="nav-in"><span class="brand">부수입 장부</span><div class="tools">
-      <button class="btn" id="btnExport" type="button">CSV 내보내기</button>
-      <button class="btn" id="btnCopy" type="button">CSV 복사</button>
-      <button class="btn" id="btnImport" type="button">CSV 가져오기</button>
-      <input type="file" id="fileIn" accept=".csv,text/csv" hidden>
-    </div></div></nav>
+<nav class="nav"><div class="nav-in"><span class="brand">부수입 장부</span>
+  <div class="tabs" role="tablist" aria-label="화면 선택">
+    <button class="tab active" type="button" role="tab" aria-selected="true" data-v="log">부수입 기록</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-v="summary">월별 요약</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-v="check">지출 점검표</button>
+  </div></div></nav>
 <div class="wrap">
   <div class="msg" id="msg" role="status"></div>
 
-  <div class="tiles" id="tiles"></div>
-
+  <div class="view" id="view-log">
   <section>
     <h2 id="formTitle">부수입 추가</h2>
     <form id="f">
@@ -136,31 +145,11 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   </section>
 
   <section>
-    <h2>기록 목록</h2>
+    <div class="listhead"><h2>기록 목록</h2><button class="btn" id="btnExport" type="button">CSV 내보내기</button></div>
     <div class="scroll"><table>
       <thead><tr><th>상태</th><th>항목</th><th>상세</th><th>플랫폼</th><th>신청일</th><th>예정일</th><th>실입금일</th><th class="num">금액</th><th>메모</th><th></th></tr></thead>
       <tbody id="rows"></tbody>
     </table></div>
-  </section>
-
-  <div class="two">
-    <section><h2>항목별 누적</h2><div id="byCat"></div></section>
-    <section><h2>월별 누적</h2><div id="byMonth"></div></section>
-  </div>
-
-  <section>
-    <h2>데일리 지출 점검표</h2>
-    <div class="week">
-      <div class="row">
-        <button class="btn" id="wPrev" type="button">이전 주</button>
-        <button class="btn" id="wThis" type="button">이번 주</button>
-        <button class="btn" id="wNext" type="button">다음 주</button>
-      </div>
-      <div><span id="wLabel"></span> · 실천율 <span class="rate" id="wRate">-</span></div>
-    </div>
-    <p class="sub" style="margin-bottom:8px">칸을 누르면 O, X, 비움 순서로 바뀝니다.</p>
-    <div class="scroll"><table class="chk" id="chk" style="min-width:520px"></table></div>
-    <label style="margin-top:12px">이번 주 한 줄 회고<input id="retro" maxlength="120" placeholder="이번 주 소비를 한 줄로 돌아보기"></label>
   </section>
 
   <section>
@@ -175,8 +164,41 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   <section>
     <h2>데이터 관리</h2>
     <p class="sub">브라우저 기록이나 사이트 데이터를 지우면 기록도 함께 사라집니다. 가끔 CSV로 백업하세요.</p>
-    <div class="row" style="margin-top:10px"><button class="btn danger" id="btnWipe" type="button">전체 삭제</button></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="btnCopy" type="button">CSV 복사</button>
+      <button class="btn" id="btnImport" type="button">CSV 가져오기</button>
+      <input type="file" id="fileIn" accept=".csv,text/csv" hidden>
+      <button class="btn danger" id="btnWipe" type="button">전체 삭제</button>
+    </div>
   </section>
+  </div>
+
+  <div class="view" id="view-summary" hidden>
+  <div class="tiles" id="tiles"></div>
+
+  <div class="two">
+    <section><h2>항목별 누적</h2><div id="byCat"></div></section>
+    <section><h2>월별 누적</h2><div id="byMonth"></div></section>
+  </div>
+
+  </div>
+
+  <div class="view" id="view-check" hidden>
+  <section>
+    <h2>데일리 지출 점검표</h2>
+    <div class="week">
+      <div class="row">
+        <button class="btn" id="wPrev" type="button">이전 주</button>
+        <button class="btn" id="wThis" type="button">이번 주</button>
+        <button class="btn" id="wNext" type="button">다음 주</button>
+      </div>
+      <div><span id="wLabel"></span> · 실천율 <span class="rate" id="wRate">-</span></div>
+    </div>
+    <p class="sub" style="margin-bottom:8px">칸을 누르면 O, X, 비움 순서로 바뀝니다.</p>
+    <div class="scroll"><table class="chk" id="chk" style="min-width:520px"></table></div>
+    <label style="margin-top:12px">이번 주 한 줄 회고<input id="retro" maxlength="120" placeholder="이번 주 소비를 한 줄로 돌아보기"></label>
+  </section>
+  </div>
 </div>
 
 <dialog id="dlg">
@@ -490,6 +512,24 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
       });
     });
   };
+
+  /* ---------- 상단 탭 3개 ---------- */
+  var VIEWS=['log','summary','check'];
+  function showView(v,keepScroll){
+    if(VIEWS.indexOf(v)<0)v='log';
+    VIEWS.forEach(function(k){
+      $('view-'+k).hidden=(k!==v);
+      var b=document.querySelector('.tab[data-v="'+k+'"]');
+      b.classList.toggle('active',k===v);b.setAttribute('aria-selected',k===v?'true':'false');
+    });
+    try{if(location.hash.slice(1)!==v)location.hash=v}catch(e){}
+    if(!keepScroll)window.scrollTo(0,0);
+  }
+  document.querySelector('.tabs').addEventListener('click',function(e){
+    var b=e.target.closest('.tab');if(b)showView(b.getAttribute('data-v'));
+  });
+  window.addEventListener('hashchange',function(){showView(location.hash.slice(1),true)});
+  showView(location.hash.slice(1),true);
   render();
 })();
 
