@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#080a1f">
 <meta name="color-scheme" content="light">
-<title>부수입 장부</title>
+<title>뉴저지새댁 부수입</title>
 <style>
 /* 애플 스타일: 넓은 여백, 큰 제목, 흰 카드와 연회색 바탕, 반투명 상단바, 알약 버튼, 파란 포인트 (라이트·다크 자동) */
 :root{
@@ -25,8 +25,8 @@ body{background:
     var(--bg);
   background-attachment:fixed;min-height:100%;color:var(--ink);font-family:var(--body);line-height:1.5;font-size:15px;-webkit-font-smoothing:antialiased}
 .nav{position:sticky;top:0;z-index:10;background:var(--nav);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--line)}
-.nav-in{max-width:980px;margin:0 auto;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.brand{font-weight:700;font-size:15px;letter-spacing:-.01em;display:inline-flex;align-items:center;gap:8px}
+.nav-in{max-width:980px;margin:0 auto;padding:12px 16px;display:flex;flex-direction:column;align-items:stretch;gap:10px}
+.brand{font-weight:800;font-size:clamp(24px,5.5vw,30px);line-height:1.2;letter-spacing:-.02em;display:inline-flex;align-items:center;gap:8px}
 .brand::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent)}
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:24px 16px 80px;display:flex;flex-direction:column;gap:24px}
 h1{font-family:var(--display);font-size:clamp(34px,7vw,56px);line-height:1.08;margin:0;font-weight:700;letter-spacing:-.035em;text-wrap:balance}
@@ -93,8 +93,8 @@ dialog::backdrop{background:rgba(0,0,0,.4);-webkit-backdrop-filter:blur(6px);bac
 .nav .btn:hover{background:rgba(255,255,255,.24);filter:none}
 .msg{color:rgba(255,255,255,.78)}
 section,.tile{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(4,5,25,.35)}
-.tabs{display:flex;gap:4px;background:rgba(255,255,255,.12);padding:4px;border-radius:980px}
-.tab{border:0;background:transparent;color:#fff;border-radius:980px;padding:8px 18px;cursor:pointer;font-weight:500;min-height:36px;font-size:14px;white-space:nowrap}
+.tabs{display:flex;width:100%;gap:4px;background:rgba(255,255,255,.12);padding:4px;border-radius:980px}
+.tab{flex:1;border:0;background:transparent;color:#fff;border-radius:980px;padding:8px 18px;cursor:pointer;font-weight:500;min-height:36px;font-size:14px;white-space:nowrap}
 .tab:hover{background:rgba(255,255,255,.14)}
 .tab.active{background:#fff;color:var(--accent-text);font-weight:700}
 .tab:focus-visible{outline:3px solid rgba(255,255,255,.7);outline-offset:2px}
@@ -102,7 +102,7 @@ section,.tile{-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-
 .view[hidden]{display:none}
 .listhead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:16px}
 .listhead h2{margin:0}
-@media (max-width:720px){.tabs{width:100%}.tab{flex:1;padding:8px 6px}}
+@media (max-width:720px){.tab{padding:8px 6px}}
 th{background:#ddd6fc;color:#3b2f9a;font-weight:700;font-size:13px;text-align:center;border:1px solid #ffffff;border-bottom:1px solid #ffffff}
 th.num{text-align:center}
 .chk th:first-child{text-align:center}
@@ -121,7 +121,7 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 </head>
 <body>
 <canvas id="stars" aria-hidden="true"></canvas>
-<nav class="nav"><div class="nav-in"><span class="brand">부수입 장부</span>
+<nav class="nav"><div class="nav-in"><span class="brand">뉴저지새댁 부수입</span>
   <div class="tabs" role="tablist" aria-label="화면 선택">
     <button class="tab active" type="button" role="tab" aria-selected="true" data-v="log">부수입 기록</button>
     <button class="tab" type="button" role="tab" aria-selected="false" data-v="summary">월별 요약</button>
