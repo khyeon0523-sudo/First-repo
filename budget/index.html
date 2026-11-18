@@ -126,6 +126,12 @@ section.white{background:#ffffff}
 .vamt{font-size:11px;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink)}
 .vbar{width:60%;max-width:34px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#8f7bff,#6b5bd6)}
 .vlab{font-size:12px;color:var(--muted);border-top:1px solid #ddd6fc;padding-top:4px;width:100%;text-align:center}
+.week{justify-content:flex-end}
+.weeknav{display:flex;align-items:center;gap:10px}
+#wLabel{font-size:13px;font-weight:500;font-variant-numeric:tabular-nums}
+.navbtn{width:30px;height:30px;border-radius:50%;border:1px solid #ddd6fc;background:#ffffff;color:#5646c2;font-weight:700;font-size:14px;line-height:1;cursor:pointer;padding:0}
+.navbtn:hover{background:#f3f0ff}
+.navbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 textarea.big{min-height:120px;font-family:monospace;font-size:12px}
 @media (max-width:720px){
   section{padding:20px;border-radius:20px}
@@ -211,12 +217,11 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   <section>
     <h2>데일리 지출 점검표</h2>
     <div class="week">
-      <div class="row">
-        <button class="btn" id="wPrev" type="button">이전 주</button>
-        <button class="btn" id="wThis" type="button">이번 주</button>
-        <button class="btn" id="wNext" type="button">다음 주</button>
+      <div class="weeknav">
+        <button class="navbtn" id="wPrev" type="button" aria-label="이전 주">&lt;</button>
+        <span id="wLabel"></span>
+        <button class="navbtn" id="wNext" type="button" aria-label="다음 주">&gt;</button>
       </div>
-      <div><span id="wLabel"></span> · 실천율 <span class="rate" id="wRate">-</span></div>
     </div>
     <p class="sub" style="margin-bottom:8px">칸을 누르면 O, X, 비움 순서로 바뀝니다.</p>
     <div class="scroll"><table class="chk" id="chk" style="min-width:520px"></table></div>
@@ -373,12 +378,8 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
       }).join('')+'</tr>';
     });
     $('chk').innerHTML=h+'</tbody>';
-    var nowD=new Date();nowD.setHours(0,0,0,0);
-    var counted=0,o=0;
-    days.forEach(function(d){if(d<=nowD){counted++;var c=checks[ymd(d)]||{};HABITS.forEach(function(hb){if(c[hb.id]==='O')o++})}});
-    $('wRate').textContent=counted?Math.round(o/(counted*HABITS.length)*100)+'%':'-';
     var e=days[6];
-    $('wLabel').textContent=days[0].getFullYear()+'.'+(days[0].getMonth()+1)+'.'+days[0].getDate()+' ~ '+(e.getMonth()+1)+'.'+e.getDate();
+    $('wLabel').textContent=days[0].getFullYear()+'.'+pad(days[0].getMonth()+1)+'.'+pad(days[0].getDate())+' ~ '+pad(e.getMonth()+1)+'.'+pad(e.getDate());
     $('retro').value=retros[ymd(s)]||'';
   }
   $('chk').addEventListener('click',function(e){
@@ -399,7 +400,6 @@ textarea.big{min-height:120px;font-family:monospace;font-size:12px}
   });
   $('wPrev').onclick=function(){weekOffset--;renderWeek()};
   $('wNext').onclick=function(){weekOffset++;renderWeek()};
-  $('wThis').onclick=function(){weekOffset=0;renderWeek()};
 
   /* ---------- CSV ---------- */
   var HEAD=['기록일','항목','상세내용','플랫폼','신청일','입금예정일','실입금일','금액','메모'];
